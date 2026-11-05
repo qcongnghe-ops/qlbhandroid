@@ -7,9 +7,16 @@ class PosRepository(private val database: PosDatabase) {
     val products: Flow<List<Product>> = dao.products()
     val lowStock: Flow<List<Product>> = dao.lowStock()
     val customers: Flow<List<Customer>> = dao.customers()
+    val suppliers: Flow<List<Supplier>> = dao.suppliers()
+    val users: Flow<List<AppUser>> = dao.users()
     val sales: Flow<List<Sale>> = dao.sales()
     val tickets: Flow<List<ServiceTicket>> = dao.tickets()
     val cashEntries: Flow<List<CashEntry>> = dao.cashEntries()
+    suspend fun userCount() = dao.userCount()
+    suspend fun userByUsername(username: String) = dao.userByUsername(username)
+    suspend fun insertUser(user: AppUser) = dao.insertUser(user)
+    suspend fun updateUser(id: Long, displayName: String, role: String, active: Boolean) = dao.updateUser(id, displayName, role, active)
+    suspend fun updatePassword(id: Long, hash: String, salt: String) = dao.updatePassword(id, hash, salt)
 
     suspend fun seedIfEmpty() {
         if (dao.productCount() == 0) {
@@ -23,10 +30,13 @@ class PosRepository(private val database: PosDatabase) {
             ).forEach { dao.saveProduct(it) }
         }
     }
-
     suspend fun saveProduct(product: Product) = dao.saveProduct(product)
+    suspend fun deleteProduct(id: Long) = dao.deleteProduct(id)
     suspend fun addStock(id: Long, quantity: Int) = dao.addStock(id, quantity)
     suspend fun saveCustomer(customer: Customer) = dao.saveCustomer(customer)
+    suspend fun deleteCustomer(id: Long) = dao.deleteCustomer(id)
+    suspend fun saveSupplier(supplier: Supplier) = dao.saveSupplier(supplier)
+    suspend fun deleteSupplier(id: Long) = dao.deleteSupplier(id)
     suspend fun checkout(sale: Sale, lines: List<SaleLine>) = dao.checkout(sale, lines)
     suspend fun addTicket(ticket: ServiceTicket) = dao.insertTicket(ticket)
     suspend fun updateTicketStatus(id: Long, status: String) = dao.updateTicketStatus(id, status)
