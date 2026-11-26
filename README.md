@@ -18,6 +18,10 @@
 - Jetpack Compose + Material 3
 - Room (SQLite), Kotlin Coroutines/Flow, ViewModel
 
+## Tải APK (debug)
+
+[Tải qlbh-debug.apk](https://github.com/qcongnghe-ops/qlbhandroid/releases/download/debug-latest/qlbh-debug.apk) — bản mới nhất, tự động build bằng GitHub Actions. Cần bật "Cài ứng dụng từ nguồn không xác định" trên Android.
+
 ## Chạy ứng dụng
 
 1. Mở repository bằng Android Studio (Hedgehog trở lên) và cài Android SDK 35.
