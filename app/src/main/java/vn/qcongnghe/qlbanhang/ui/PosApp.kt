@@ -177,18 +177,18 @@ private fun PosScreen(products: List<Product>, cart: MutableList<CartRow>, custo
 private fun ProductScreen(products: List<Product>, save: (Product) -> Unit, addStock: (Long, Int) -> Unit, delete: (Long) -> Unit) {
     LazyColumn(Modifier.fillMaxSize().padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         item { Heading("Kho hàng · ${products.size} sản phẩm"); Text("Nhấn + để thêm; bút chì để sửa; nhập nhanh số lượng.") }
-        items(products, key = { it.id }) { p -> Card { Column(Modifier.fillMaxWidth().padding(12.dp)) { Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) { Column(Modifier.weight(1f)) { Text(p.name, fontWeight = FontWeight.Bold); Text("${p.sku} · ${p.category} · ${p.brand}"); Text("Giá vốn ${money(p.cost)} · Giá bán ${money(p.price)}"); Text("Tồn ${p.stock} · báo thấp ${p.minStock}") }; TextButton(onClick = { ProductDialog(p, save) { } }) { Text("Sửa") } }; Row { TextButton(onClick = { addStock(p.id, 1) }) { Text("+ Nhập 1") }; TextButton(onClick = { delete(p.id) }) { Text("Xóa") } } } } }
+        items(products, key = { it.id }) { p -> Card { Column(Modifier.fillMaxWidth().padding(12.dp)) { Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) { Column(Modifier.weight(1f)) { Text(p.name, fontWeight = FontWeight.Bold); Text("${p.sku} · ${p.category} · ${p.brand}"); Text("Giá vốn ${money(p.cost)} · Giá bán ${money(p.price)}"); Text("Tồn ${p.stock} · báo thấp ${p.minStock}") }; EditButton { close -> ProductDialog(p, save, close) } }; Row { TextButton(onClick = { addStock(p.id, 1) }) { Text("+ Nhập 1") }; TextButton(onClick = { delete(p.id) }) { Text("Xóa") } } } } }
     }
 }
 
 @Composable
 private fun CustomerScreen(rows: List<Customer>, save: (Customer) -> Unit, delete: (Long) -> Unit) {
-    LazyColumn(Modifier.fillMaxSize().padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) { item { Heading("Khách hàng (${rows.size})") }; items(rows, key = { it.id }) { c -> Card { Row(Modifier.fillMaxWidth().padding(12.dp), horizontalArrangement = Arrangement.SpaceBetween) { Column(Modifier.weight(1f)) { Text(c.name, fontWeight = FontWeight.Bold); Text(c.phone); Text(c.note) }; TextButton(onClick = { CustomerDialog(c, save) }) { Text("Sửa") }; TextButton(onClick = { delete(c.id) }) { Text("Xóa") } } } } }
+    LazyColumn(Modifier.fillMaxSize().padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) { item { Heading("Khách hàng (${rows.size})") }; items(rows, key = { it.id }) { c -> Card { Row(Modifier.fillMaxWidth().padding(12.dp), horizontalArrangement = Arrangement.SpaceBetween) { Column(Modifier.weight(1f)) { Text(c.name, fontWeight = FontWeight.Bold); Text(c.phone); Text(c.note) }; EditButton { close -> CustomerDialog(c, save, close) }; TextButton(onClick = { delete(c.id) }) { Text("Xóa") } } } } }
 }
 
 @Composable
 private fun SupplierScreen(rows: List<Supplier>, save: (Supplier) -> Unit, delete: (Long) -> Unit) {
-    LazyColumn(Modifier.fillMaxSize().padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) { item { Heading("Nhà cung cấp (${rows.size})") }; items(rows, key = { it.id }) { s -> Card { Row(Modifier.fillMaxWidth().padding(12.dp), horizontalArrangement = Arrangement.SpaceBetween) { Column(Modifier.weight(1f)) { Text(s.name, fontWeight = FontWeight.Bold); Text("${s.phone} · ${s.email}"); Text(s.address) }; TextButton(onClick = { SupplierDialog(s, save) }) { Text("Sửa") }; TextButton(onClick = { delete(s.id) }) { Text("Xóa") } } } } }
+    LazyColumn(Modifier.fillMaxSize().padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) { item { Heading("Nhà cung cấp (${rows.size})") }; items(rows, key = { it.id }) { s -> Card { Row(Modifier.fillMaxWidth().padding(12.dp), horizontalArrangement = Arrangement.SpaceBetween) { Column(Modifier.weight(1f)) { Text(s.name, fontWeight = FontWeight.Bold); Text("${s.phone} · ${s.email}"); Text(s.address) }; EditButton { close -> SupplierDialog(s, save, close) }; TextButton(onClick = { delete(s.id) }) { Text("Xóa") } } } } }
 }
 
 @Composable
@@ -226,7 +226,7 @@ private fun ProductDialog(initial: Product?, save: (Product) -> Unit, close: () 
 @Composable
 private fun AddCustomerButton(initial: Customer?, save: (Customer) -> Unit) { var open by remember { mutableStateOf(false) }; FloatingActionButton(onClick = { open = true }) { Text("+") }; if (open) CustomerDialog(initial, save) { open = false } }
 @Composable
-private fun CustomerDialog(initial: Customer?, save: (Customer) -> Unit) { var name by remember(initial) { mutableStateOf(initial?.name.orEmpty()) }; var phone by remember(initial) { mutableStateOf(initial?.phone.orEmpty()) }; var note by remember(initial) { mutableStateOf(initial?.note.orEmpty()) }; var open by remember { mutableStateOf(true) }; if (open) AlertDialog(onDismissRequest = { open = false }, title = { Text("Khách hàng") }, text = { Column { Field(name, { name = it }, "Họ tên*"); Field(phone, { phone = it }, "Điện thoại"); Field(note, { note = it }, "Ghi chú") } }, confirmButton = { TextButton(onClick = { if (name.isNotBlank()) { save(Customer(id = initial?.id ?: 0, name = name.trim(), phone = phone.trim(), note = note.trim())); open = false } }) { Text("Lưu") } }, dismissButton = { TextButton(onClick = { open = false }) { Text("Hủy") } }) }
+private fun CustomerDialog(initial: Customer?, save: (Customer) -> Unit, close: () -> Unit = {}) { var name by remember(initial) { mutableStateOf(initial?.name.orEmpty()) }; var phone by remember(initial) { mutableStateOf(initial?.phone.orEmpty()) }; var note by remember(initial) { mutableStateOf(initial?.note.orEmpty()) }; AlertDialog(onDismissRequest = close, title = { Text("Khách hàng") }, text = { Column { Field(name, { name = it }, "Họ tên*"); Field(phone, { phone = it }, "Điện thoại"); Field(note, { note = it }, "Ghi chú") } }, confirmButton = { TextButton(onClick = { if (name.isNotBlank()) { save(Customer(id = initial?.id ?: 0, name = name.trim(), phone = phone.trim(), note = note.trim())); close() } }) { Text("Lưu") } }, dismissButton = { TextButton(onClick = close) { Text("Hủy") } }) }
 
 @Composable
 private fun AddSupplierButton(initial: Supplier?, save: (Supplier) -> Unit) { var open by remember { mutableStateOf(false) }; FloatingActionButton(onClick = { open = true }) { Text("+") }; if (open) SupplierDialog(initial, save) { open = false } }
@@ -254,3 +254,6 @@ private fun sameMonth(t: Long, now: Calendar): Boolean { val a = Calendar.getIns
 private fun date(t: Long) = SimpleDateFormat("dd/MM/yyyy", Locale("vi", "VN")).format(Date(t))
 private fun dateTime(t: Long) = SimpleDateFormat("dd/MM HH:mm", Locale("vi", "VN")).format(Date(t))
 private fun roleName(role: String) = when (role) { "ADMIN" -> "Quản trị"; "CASHIER" -> "Thu ngân"; else -> "Kỹ thuật" }
+
+@Composable
+private fun EditButton(dialog: @Composable (close: () -> Unit) -> Unit) { var open by remember { mutableStateOf(false) }; TextButton(onClick = { open = true }) { Text("Sửa") }; if (open) dialog { open = false } }
